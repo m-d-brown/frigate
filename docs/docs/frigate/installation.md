@@ -206,7 +206,14 @@ To install make sure you have the [community app plugin here](https://forums.unr
 
 ## Proxmox
 
-It is recommended to run Frigate in LXC for maximum performance. See [this discussion](https://github.com/blakeblackshear/frigate/discussions/1111) for more information.
+It is recommended to run Frigate in LXC, rather than a VM, for maximum performance. The setup can be complex so be prepared to read the Proxmox and LXC documentation. Successfully passing hardware devices through multiple levels of containerization (LXC then Docker) can be difficult as well so be ready to run Frigate in a privileged LXC container. Some other suggestions:
+
+- For Intel, to allow access to the `/dev/dri/renderD128` device with major number 226 and minor number 128, add the following lines to the `/etc/pve/lxc/<id>.conf` LXC configuration:
+  - `lxc.cgroup2.devices.allow: c 226:128 rwm`
+  - `lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file`
+- The LXC configuration will likely also need `features: fuse=1,nesting=1`. This allows running a Docker container in an LXC container (nesting) and prevents duplicated files and wasted storage (fuse).
+
+See the [Proxmox LXC discussion](https://github.com/blakeblackshear/frigate/discussions/1111) for more information.
 
 ## ESXi
 
